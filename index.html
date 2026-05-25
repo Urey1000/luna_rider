@@ -10,269 +10,58 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
   <style>
-    :root {
-      --primary: #10b981;
-      --primary-dark: #059669;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
-      --bg-gray: #f8fafc;
-      --border: #e2e8f0;
-      --danger: #ef4444;
-    }
+    :root { --primary:#10b981; --primary-dark:#059669; --text-main:#1e293b; --text-muted:#64748b; --bg-gray:#f8fafc; --border:#e2e8f0; --danger:#ef4444; }
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+    body { height:100vh; overflow:hidden; background:#000; }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
-    }
+    #auth-screen { position:fixed; inset:0; background:linear-gradient(135deg,#0f172a,#1e293b); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:9999; padding:20px; }
+    #auth-screen.hidden { display:none; }
 
-    body {
-      height: 100vh;
-      overflow: hidden;
-      background: #000;
-    }
+    .brand-container { text-align:center; margin-bottom:35px; width:100%; max-width:300px; }
+    .brand-title { color:#fff; font-size:36px; font-weight:700; letter-spacing:2px; margin-bottom:8px; animation:pulseGlow 2s infinite alternate; }
+    .car-track { position:relative; height:30px; border-bottom:2px dashed rgba(255,255,255,0.3); overflow:hidden; }
+    .car-anim { position:absolute; bottom:2px; color:var(--primary); font-size:24px; animation:driveCar 3s linear infinite; }
 
-    #auth-screen {
-      position: fixed;
-      inset: 0;
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      padding: 20px;
-    }
+    @keyframes pulseGlow { from{ text-shadow:0 0 10px rgba(16,185,129,0.2); } to{ text-shadow:0 0 22px rgba(16,185,129,0.8); } }
+    @keyframes driveCar { 0%{ left:-35px; opacity:0; } 10%{ opacity:1; } 90%{ opacity:1; } 100%{ left:100%; opacity:0; } }
 
-    #auth-screen.hidden {
-      display: none;
-    }
+    .auth-card { width:100%; max-width:400px; background:#fff; padding:28px; border-radius:24px; box-shadow:0 15px 35px rgba(0,0,0,0.25); }
+    .auth-title { text-align:center; color:var(--text-main); margin-bottom:20px; font-size:22px; font-weight:700; }
+    .auth-input { width:100%; padding:14px 16px; background:var(--bg-gray); border:1px solid var(--border); border-radius:12px; margin-bottom:14px; font-size:15px; outline:none; }
+    .auth-input:focus { border-color:var(--primary); box-shadow:0 0 0 4px rgba(16,185,129,0.1); background:#fff; }
+    .auth-btn { width:100%; padding:14px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; margin-top:5px; }
+    .auth-switch { text-align:center; margin-top:16px; font-size:14px; color:var(--text-muted); }
+    .auth-switch span { color:var(--primary); font-weight:700; cursor:pointer; }
 
-    .brand-container {
-      text-align: center;
-      margin-bottom: 35px;
-      width: 100%;
-      max-width: 300px;
-    }
+    .app { height:100vh; display:flex; flex-direction:column; background:#fff; }
+    .topbar { background:#fff; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; z-index:1000; box-shadow:0 2px 10px rgba(0,0,0,0.08); }
+    .topbar h3 { color:var(--text-main); font-size:18px; }
+    .topbar button { border:none; background:#ecfdf5; color:var(--primary-dark); padding:8px 12px; border-radius:20px; font-weight:700; cursor:pointer; }
 
-    .brand-title {
-      color: #fff;
-      font-size: 36px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      margin-bottom: 8px;
-      animation: pulseGlow 2s infinite alternate;
-    }
+    #map { flex:1; width:100%; z-index:1; }
 
-    .car-track {
-      position: relative;
-      height: 30px;
-      border-bottom: 2px dashed rgba(255,255,255,0.3);
-      overflow: hidden;
-    }
-
-    .car-anim {
-      position: absolute;
-      bottom: 2px;
-      color: var(--primary);
-      font-size: 24px;
-      animation: driveCar 3s linear infinite;
-    }
-
-    @keyframes pulseGlow {
-      from { text-shadow: 0 0 10px rgba(16,185,129,0.2); }
-      to { text-shadow: 0 0 22px rgba(16,185,129,0.8); }
-    }
-
-    @keyframes driveCar {
-      0% { left: -35px; opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { left: 100%; opacity: 0; }
-    }
-
-    .auth-card {
-      width: 100%;
-      max-width: 400px;
-      background: #fff;
-      padding: 28px;
-      border-radius: 24px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.25);
-    }
-
-    .auth-title {
-      text-align: center;
-      color: var(--text-main);
-      margin-bottom: 20px;
-      font-size: 22px;
-      font-weight: 700;
-    }
-
-    .auth-input {
-      width: 100%;
-      padding: 14px 16px;
-      background: var(--bg-gray);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      margin-bottom: 14px;
-      font-size: 15px;
-      outline: none;
-    }
-
-    .auth-input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(16,185,129,0.1);
-      background: #fff;
-    }
-
-    .auth-btn {
-      width: 100%;
-      padding: 14px;
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 5px;
-    }
-
-    .auth-switch {
-      text-align: center;
-      margin-top: 16px;
-      font-size: 14px;
-      color: var(--text-muted);
-    }
-
-    .auth-switch span {
-      color: var(--primary);
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .app {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background: #fff;
-    }
-
-    .topbar {
-      background: #fff;
-      padding: 14px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 1000;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    }
-
-    .topbar h3 {
-      color: var(--text-main);
-      font-size: 18px;
-    }
-
-    .topbar button {
-      border: none;
-      background: #ecfdf5;
-      color: var(--primary-dark);
-      padding: 8px 12px;
-      border-radius: 20px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    #map {
-      flex: 1;
-      width: 100%;
-      z-index: 1;
-    }
-
-    .booking-panel {
-      background: #fff;
-      padding: 16px;
-      border-radius: 22px 22px 0 0;
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.12);
-      z-index: 1000;
-    }
-
-    .hint {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-      text-align: center;
-    }
-
-    .field-row {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .field-row input {
-      flex: 1;
-      padding: 13px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      font-size: 14px;
-      outline: none;
-      background: var(--bg-gray);
-    }
-
-    .field-row button {
-      width: 95px;
-      border: none;
-      border-radius: 12px;
-      background: var(--primary);
-      color: #fff;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .order-btn {
-      width: 100%;
-      padding: 15px;
-      border: none;
-      border-radius: 14px;
-      background: var(--primary);
-      color: #fff;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 8px;
-    }
-
-    .info-box {
-      background: #f1f5f9;
-      border-radius: 12px;
-      padding: 10px;
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-top: 8px;
-      line-height: 1.5;
-    }
+    .booking-panel { background:#fff; padding:16px; border-radius:22px 22px 0 0; box-shadow:0 -4px 20px rgba(0,0,0,0.12); z-index:1000; }
+    .hint { font-size:13px; color:var(--text-muted); margin-bottom:12px; text-align:center; }
+    .field-row { display:flex; gap:8px; margin-bottom:10px; }
+    .field-row input { flex:1; padding:13px; border:1px solid var(--border); border-radius:12px; font-size:14px; outline:none; background:var(--bg-gray); }
+    .field-row button { width:95px; border:none; border-radius:12px; background:var(--primary); color:#fff; font-weight:700; cursor:pointer; }
+    .order-btn { width:100%; padding:15px; border:none; border-radius:14px; background:var(--primary); color:#fff; font-size:16px; font-weight:700; cursor:pointer; margin-top:8px; }
+    .info-box { background:#f1f5f9; border-radius:12px; padding:10px; font-size:13px; color:var(--text-muted); margin-top:8px; line-height:1.5; }
   </style>
 </head>
 
 <body>
-
   <div id="auth-screen">
     <div class="brand-container">
       <div class="brand-title">LUNA RIDE</div>
-      <div class="car-track">
-        <i class="fa-solid fa-car-side car-anim"></i>
-      </div>
+      <div class="car-track"><i class="fa-solid fa-car-side car-anim"></i></div>
     </div>
 
     <div class="auth-card">
       <h2 class="auth-title" id="authTitle">Masuk Akun</h2>
-
       <input type="text" id="nameInput" class="auth-input" placeholder="Nama lengkap" style="display:none;">
       <input type="text" id="phoneInput" class="auth-input" placeholder="Nomor HP">
       <input type="password" id="passwordInput" class="auth-input" placeholder="Password">
-
       <button type="button" class="auth-btn" onclick="authAction()" id="authBtn">Masuk</button>
 
       <div class="auth-switch">
@@ -293,9 +82,7 @@
     <div id="map"></div>
 
     <div class="booking-panel">
-      <div class="hint" id="hintText">
-        Klik tombol Asal/Tujuan, lalu klik titik di map.
-      </div>
+      <div class="hint" id="hintText">Klik tombol Asal/Tujuan, lalu klik titik di map.</div>
 
       <div class="field-row">
         <input id="pickup" placeholder="Lokasi asal" readonly>
@@ -337,7 +124,6 @@
 
     function toggleAuth() {
       isRegister = !isRegister;
-
       document.getElementById("authTitle").innerText = isRegister ? "Daftar Akun" : "Masuk Akun";
       document.getElementById("authBtn").innerText = isRegister ? "Daftar" : "Masuk";
       document.getElementById("nameInput").style.display = isRegister ? "block" : "none";
@@ -430,11 +216,7 @@
       asalLatLng = [lat, lng];
 
       const asalIcon = L.divIcon({
-        html: `
-          <div style="width:38px;height:38px;background:#10b981;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.3);">
-            <i class="fa-solid fa-user"></i>
-          </div>
-        `,
+        html: `<div style="width:38px;height:38px;background:#10b981;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.3);"><i class="fa-solid fa-user"></i></div>`,
         className: "",
         iconSize: [38, 38],
         iconAnchor: [19, 19]
@@ -459,11 +241,7 @@
       tujuanLatLng = [lat, lng];
 
       const tujuanIcon = L.divIcon({
-        html: `
-          <div style="width:38px;height:38px;background:#ef4444;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.3);">
-            <i class="fa-solid fa-flag-checkered"></i>
-          </div>
-        `,
+        html: `<div style="width:38px;height:38px;background:#ef4444;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.3);"><i class="fa-solid fa-flag-checkered"></i></div>`,
         className: "",
         iconSize: [38, 38],
         iconAnchor: [19, 19]
@@ -530,6 +308,10 @@
             Status: Menunggu driver.<br>
             ID Order: ${orderId}
           `;
+
+          if (typeof window.pantauStatusOrder === "function") {
+            window.pantauStatusOrder(orderId);
+          }
         })
         .catch((error) => {
           alert("Gagal kirim order: " + error.message);
@@ -546,7 +328,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAPmHTjD7HvqQALbegPVBDEE8utz6wqb7o",
@@ -582,6 +364,30 @@
       };
 
       return set(orderRef, dataOrder).then(() => orderRef.key);
+    };
+
+    window.pantauStatusOrder = function(orderId) {
+      const orderStatusRef = ref(db, "orders/" + orderId);
+
+      onValue(orderStatusRef, function(snapshot) {
+        const order = snapshot.val();
+
+        if (!order) return;
+
+        if (order.status === "menunggu_driver") {
+          document.getElementById("infoBox").innerHTML = `
+            <b>Pesanan berhasil dikirim!</b><br>
+            Status: Menunggu driver.
+          `;
+        }
+
+        if (order.status === "driver_menuju_penumpang") {
+          document.getElementById("infoBox").innerHTML = `
+            <b>Driver menerima pesanan!</b><br>
+            Driver sedang menuju lokasi penjemputan.
+          `;
+        }
+      });
     };
   </script>
 
