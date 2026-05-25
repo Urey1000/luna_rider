@@ -303,21 +303,64 @@
 
       window.kirimOrderKeFirebase(asalLatLng, tujuanLatLng, userData)
         .then((orderId) => {
-          document.getElementById("infoBox").innerHTML = `
-            <b>Pesanan berhasil dikirim!</b><br>
-            Status: Menunggu driver.<br>
-            ID Order: ${orderId}
-          `;
+  const jarakKm = hitungJarakKm(asalLatLng, tujuanLatLng);
+  const tarif = hitungTarif(jarakKm);
 
-          if (typeof window.pantauStatusOrder === "function") {
-            window.pantauStatusOrder(orderId);
-          }
-        })
+  document.getElementById("infoBox").innerHTML = `
+    <b>Pesanan berhasil dikirim!</b><br>
+    Status: Menunggu driver.<br>
+    Jarak: ${jarakKm.toFixed(2)} km<br>
+    Tarif: ${formatRupiah(tarif)}<br>
+    ID Order: ${orderId}
+  `;
+
+  if (typeof window.pantauStatusOrder === "function") {
+    window.pantauStatusOrder(orderId);
+  }
+})
         .catch((error) => {
           alert("Gagal kirim order: " + error.message);
           document.getElementById("infoBox").innerText = "Pesanan gagal dikirim.";
         });
     }
+function hitungJarakKm(asal, tujuan) {
+  const R = 6371;
+  const dLat = (tujuan[0] - asal[0]) * Math.PI / 180;
+  const dLng = (tujuan[1] - asal[1]) * Math.PI / 180;
+
+  const lat1 = asal[0] * Math.PI / 180;
+  const lat2 = tujuan[0] * Math.PI / 180;
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.sin(dLng / 2) * Math.sin(dLng / 2) *
+    Math.cos(lat1) * Math.cos(lat2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c;
+}
+
+function hitungTarif(jarakKm) {
+  const tarifDasar = 5000;
+  const tarifPerKm = 2500;
+
+  let total = tarifDasar + (jarakKm * tarifPerKm);
+
+  if (total < 8000) {
+    total = 8000;
+  }
+
+  return Math.round(total);
+}
+
+function formatRupiah(angka) {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0
+  }).format(angka);
+}
 
     window.addEventListener("beforeunload", function() {
       if (watchId !== null) {
@@ -342,29 +385,74 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+	
+	function hitungJarakKm(asal, tujuan) {
+  const R = 6371;
+  const dLat = (tujuan[0] - asal[0]) * Math.PI / 180;
+  const dLng = (tujuan[1] - asal[1]) * Math.PI / 180;
 
+  const lat1 = asal[0] * Math.PI / 180;
+  const lat2 = tujuan[0] * Math.PI / 180;
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.sin(dLng / 2) * Math.sin(dLng / 2) *
+    Math.cos(lat1) * Math.cos(lat2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c;
+}
+
+function hitungTarif(jarakKm) {
+  const tarifDasar = 5000;
+  const tarifPerKm = 2500;
+  const tarifMinimum = 8000;
+
+  let total = tarifDasar + (jarakKm * tarifPerKm);
+
+  if (total < tarifMinimum) {
+    total = tarifMinimum;
+  }
+
+  return Math.round(total);
+}
+
+function formatRupiah(angka) {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0
+  }).format(angka);
+}
     window.kirimOrderKeFirebase = function(asalLatLng, tujuanLatLng, userData) {
-      const orderRef = push(ref(db, "orders"));
+  const orderRef = push(ref(db, "orders"));
 
-      const dataOrder = {
-        customerName: userData.name || "Penumpang Luna",
-        customerPhone: userData.phone || "-",
-        asal: {
-          lat: asalLatLng[0],
-          lng: asalLatLng[1]
-        },
-        tujuan: {
-          lat: tujuanLatLng[0],
-          lng: tujuanLatLng[1]
-        },
-        status: "menunggu_driver",
-        driverId: "",
-        createdAt: Date.now(),
-        waktu: new Date().toLocaleString("id-ID")
-      };
+  const jarakKm = hitungJarakKm(asalLatLng, tujuanLatLng);
+  const tarif = hitungTarif(jarakKm);
 
-      return set(orderRef, dataOrder).then(() => orderRef.key);
-    };
+  const dataOrder = {
+    customerName: userData.name || "Penumpang Luna",
+    customerPhone: userData.phone || "-",
+    asal: {
+      lat: asalLatLng[0],
+      lng: asalLatLng[1]
+    },
+    tujuan: {
+      lat: tujuanLatLng[0],
+      lng: tujuanLatLng[1]
+    },
+    jarakKm: jarakKm.toFixed(2),
+    tarif: tarif,
+    tarifText: formatRupiah(tarif),
+    status: "menunggu_driver",
+    driverId: "",
+    createdAt: Date.now(),
+    waktu: new Date().toLocaleString("id-ID")
+  };
+
+  return set(orderRef, dataOrder).then(() => orderRef.key);
+};
 
     window.pantauStatusOrder = function(orderId) {
       const orderStatusRef = ref(db, "orders/" + orderId);
