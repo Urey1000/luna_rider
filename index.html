@@ -68,7 +68,7 @@
     .car-track {
       position: relative;
       height: 30px;
-      border-bottom: 2px dashed rgba(255, 255, 255, 0.3);
+      border-bottom: 2px dashed rgba(255,255,255,0.3);
       overflow: hidden;
     }
 
@@ -81,8 +81,8 @@
     }
 
     @keyframes pulseGlow {
-      from { text-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
-      to { text-shadow: 0 0 22px rgba(16, 185, 129, 0.8); }
+      from { text-shadow: 0 0 10px rgba(16,185,129,0.2); }
+      to { text-shadow: 0 0 22px rgba(16,185,129,0.8); }
     }
 
     @keyframes driveCar {
@@ -122,7 +122,7 @@
 
     .auth-input:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+      box-shadow: 0 0 0 4px rgba(16,185,129,0.1);
       background: #fff;
     }
 
@@ -273,7 +273,7 @@
       <input type="text" id="phoneInput" class="auth-input" placeholder="Nomor HP">
       <input type="password" id="passwordInput" class="auth-input" placeholder="Password">
 
-      <button class="auth-btn" onclick="authAction()" id="authBtn">Masuk</button>
+      <button type="button" class="auth-btn" onclick="authAction()" id="authBtn">Masuk</button>
 
       <div class="auth-switch">
         <span id="switchText">Belum punya akun?</span>
@@ -285,7 +285,7 @@
   <div class="app">
     <div class="topbar">
       <h3><i class="fa-solid fa-location-dot" style="color:#10b981;"></i> Luna Ride</h3>
-      <button onclick="centerToAsal()">
+      <button type="button" onclick="centerToAsal()">
         <i class="fa-solid fa-crosshairs"></i> Lokasi
       </button>
     </div>
@@ -299,15 +299,15 @@
 
       <div class="field-row">
         <input id="pickup" placeholder="Lokasi asal" readonly>
-        <button onclick="pilihAsal()">Asal</button>
+        <button type="button" onclick="pilihAsal()">Asal</button>
       </div>
 
       <div class="field-row">
         <input id="destination" placeholder="Lokasi tujuan" readonly>
-        <button onclick="pilihTujuan()">Tujuan</button>
+        <button type="button" onclick="pilihTujuan()">Tujuan</button>
       </div>
 
-      <button class="order-btn" onclick="pesanRide()">
+      <button type="button" class="order-btn" onclick="pesanRide()">
         <i class="fa-solid fa-motorcycle"></i> Pesan Sekarang
       </button>
 
@@ -329,6 +329,11 @@
     let modePilih = "asal";
     let watchId = null;
     let mapStarted = false;
+
+    let userData = {
+      name: "",
+      phone: ""
+    };
 
     function toggleAuth() {
       isRegister = !isRegister;
@@ -354,6 +359,9 @@
         alert("Nomor HP dan password wajib diisi");
         return;
       }
+
+      userData.name = isRegister ? name : "Penumpang Luna";
+      userData.phone = phone;
 
       document.getElementById("auth-screen").classList.add("hidden");
 
@@ -403,13 +411,9 @@
         function(error) {
           let pesan = "Gagal mengambil lokasi.";
 
-          if (error.code === 1) {
-            pesan = "Izin lokasi ditolak. Aktifkan izin lokasi browser.";
-          } else if (error.code === 2) {
-            pesan = "GPS/lokasi tidak tersedia.";
-          } else if (error.code === 3) {
-            pesan = "Pengambilan lokasi terlalu lama.";
-          }
+          if (error.code === 1) pesan = "Izin lokasi ditolak. Aktifkan izin lokasi browser.";
+          if (error.code === 2) pesan = "GPS/lokasi tidak tersedia.";
+          if (error.code === 3) pesan = "Pengambilan lokasi terlalu lama.";
 
           document.getElementById("infoBox").innerText = pesan;
           console.log(error);
@@ -427,17 +431,7 @@
 
       const asalIcon = L.divIcon({
         html: `
-          <div style="
-            width:38px;
-            height:38px;
-            background:#10b981;
-            color:white;
-            border-radius:50%;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            border:4px solid white;
-            box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+          <div style="width:38px;height:38px;background:#10b981;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.3);">
             <i class="fa-solid fa-user"></i>
           </div>
         `,
@@ -466,17 +460,7 @@
 
       const tujuanIcon = L.divIcon({
         html: `
-          <div style="
-            width:38px;
-            height:38px;
-            background:#ef4444;
-            color:white;
-            border-radius:50%;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            border:4px solid white;
-            box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+          <div style="width:38px;height:38px;background:#ef4444;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.3);">
             <i class="fa-solid fa-flag-checkered"></i>
           </div>
         `,
@@ -496,24 +480,19 @@
       document.getElementById("destination").value =
         lat.toFixed(6) + ", " + lng.toFixed(6);
 
-      document.getElementById("infoBox").innerText =
-        "Lokasi tujuan berhasil dipilih.";
+      document.getElementById("infoBox").innerText = "Lokasi tujuan berhasil dipilih.";
     }
 
     function pilihAsal() {
       modePilih = "asal";
-      document.getElementById("hintText").innerText =
-        "Mode pilih ASAL aktif. Klik titik asal di map.";
-      document.getElementById("infoBox").innerText =
-        "Silakan klik lokasi asal pada map.";
+      document.getElementById("hintText").innerText = "Mode pilih ASAL aktif. Klik titik asal di map.";
+      document.getElementById("infoBox").innerText = "Silakan klik lokasi asal pada map.";
     }
 
     function pilihTujuan() {
       modePilih = "tujuan";
-      document.getElementById("hintText").innerText =
-        "Mode pilih TUJUAN aktif. Klik titik tujuan di map.";
-      document.getElementById("infoBox").innerText =
-        "Silakan klik lokasi tujuan pada map.";
+      document.getElementById("hintText").innerText = "Mode pilih TUJUAN aktif. Klik titik tujuan di map.";
+      document.getElementById("infoBox").innerText = "Silakan klik lokasi tujuan pada map.";
     }
 
     function centerToAsal() {
@@ -537,12 +516,25 @@
         return;
       }
 
-      alert(
-        "Pesanan dibuat!\\n\\nAsal: " +
-        asalLatLng.join(", ") +
-        "\\nTujuan: " +
-        tujuanLatLng.join(", ")
-      );
+      if (typeof window.kirimOrderKeFirebase !== "function") {
+        alert("Firebase belum siap. Coba refresh halaman.");
+        return;
+      }
+
+      document.getElementById("infoBox").innerHTML = "Mengirim pesanan ke driver...";
+
+      window.kirimOrderKeFirebase(asalLatLng, tujuanLatLng, userData)
+        .then((orderId) => {
+          document.getElementById("infoBox").innerHTML = `
+            <b>Pesanan berhasil dikirim!</b><br>
+            Status: Menunggu driver.<br>
+            ID Order: ${orderId}
+          `;
+        })
+        .catch((error) => {
+          alert("Gagal kirim order: " + error.message);
+          document.getElementById("infoBox").innerText = "Pesanan gagal dikirim.";
+        });
     }
 
     window.addEventListener("beforeunload", function() {
@@ -550,6 +542,47 @@
         navigator.geolocation.clearWatch(watchId);
       }
     });
+  </script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAPmHTjD7HvqQALbegPVBDEE8utz6wqb7o",
+      authDomain: "luna-ride-projek.firebaseapp.com",
+      databaseURL: "https://luna-ride-projek-default-rtdb.asia-southeast1.firebasedatabase.app/",
+      projectId: "luna-ride-projek",
+      storageBucket: "luna-ride-projek.firebasestorage.app",
+      messagingSenderId: "350029772655",
+      appId: "1:350029772655:web:5da8abdc58810dac3f5a9a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    window.kirimOrderKeFirebase = function(asalLatLng, tujuanLatLng, userData) {
+      const orderRef = push(ref(db, "orders"));
+
+      const dataOrder = {
+        customerName: userData.name || "Penumpang Luna",
+        customerPhone: userData.phone || "-",
+        asal: {
+          lat: asalLatLng[0],
+          lng: asalLatLng[1]
+        },
+        tujuan: {
+          lat: tujuanLatLng[0],
+          lng: tujuanLatLng[1]
+        },
+        status: "menunggu_driver",
+        driverId: "",
+        createdAt: Date.now(),
+        waktu: new Date().toLocaleString("id-ID")
+      };
+
+      return set(orderRef, dataOrder).then(() => orderRef.key);
+    };
   </script>
 
 </body>
