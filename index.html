@@ -1,171 +1,155 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Luna Ride | Rider</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <style>
-    :root{--primary:#10b981;--primary-dark:#059669;--text-main:#1e293b;--text-muted:#64748b;--bg-gray:#f8fafc;--border:#e2e8f0;--danger:#ef4444}
-    *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
-    body{height:100vh;overflow:hidden;background:#000}
-    #auth-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0f172a,#1e293b);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:9999;padding:20px}
-    #auth-screen.hidden{display:none}
-    .brand-container{text-align:center;margin-bottom:35px;width:100%;max-width:300px}
-    .brand-title{color:#fff;font-size:36px;font-weight:700;letter-spacing:2px;margin-bottom:8px;animation:pulseGlow 2s infinite alternate}
-    .car-track{position:relative;height:30px;border-bottom:2px dashed rgba(255,255,255,.3);overflow:hidden}
-    .car-anim{position:absolute;bottom:2px;color:var(--primary);font-size:24px;animation:driveCar 3s linear infinite}
-    @keyframes pulseGlow{from{text-shadow:0 0 10px rgba(16,185,129,.2)}to{text-shadow:0 0 22px rgba(16,185,129,.8)}}
-    @keyframes driveCar{0%{left:-35px;opacity:0}10%{opacity:1}90%{opacity:1}100%{left:100%;opacity:0}}
-    .auth-card{width:100%;max-width:400px;background:#fff;padding:28px;border-radius:24px;box-shadow:0 15px 35px rgba(0,0,0,.25)}
-    .auth-title{text-align:center;color:var(--text-main);margin-bottom:20px;font-size:22px;font-weight:700}
-    .auth-input{width:100%;padding:14px 16px;background:var(--bg-gray);border:1px solid var(--border);border-radius:12px;margin-bottom:14px;font-size:15px;outline:none}
-    .auth-input:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(16,185,129,.1);background:#fff}
-    .auth-btn{width:100%;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;margin-top:5px}
-    .auth-switch{text-align:center;margin-top:16px;font-size:14px;color:var(--text-muted)}
-    .auth-switch span{color:var(--primary);font-weight:700;cursor:pointer}
-    .app{height:100vh;display:flex;flex-direction:column;background:#fff}
-    .topbar{background:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;z-index:1000;box-shadow:0 2px 10px rgba(0,0,0,.08)}
-    .topbar h3{color:var(--text-main);font-size:18px}
-    .topbar button{border:none;background:#ecfdf5;color:var(--primary-dark);padding:8px 12px;border-radius:20px;font-weight:700;cursor:pointer}
-    #map{flex:1;width:100%;z-index:1}
-    .booking-panel{background:#fff;padding:16px;border-radius:22px 22px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.12);z-index:1000}
-    .hint{font-size:13px;color:var(--text-muted);margin-bottom:12px;text-align:center}
-    .field-row{display:flex;gap:8px;margin-bottom:10px}
-    .field-row input{flex:1;padding:13px;border:1px solid var(--border);border-radius:12px;font-size:14px;outline:none;background:var(--bg-gray)}
-    .field-row button{width:95px;border:none;border-radius:12px;background:var(--primary);color:#fff;font-weight:700;cursor:pointer}
-    .order-btn{width:100%;padding:15px;border:none;border-radius:14px;background:var(--primary);color:#fff;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px}
-    .info-box{background:#f1f5f9;border-radius:12px;padding:10px;font-size:13px;color:var(--text-muted);margin-top:8px;line-height:1.5}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Luna Ride | Rider</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--primary:#10b981;--text:#1e293b;--muted:#64748b;--bg:#f8fafc;--border:#e2e8f0}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,sans-serif}
+body{height:100vh;overflow:hidden;background:#000}
+#auth-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0f172a,#1e293b);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+#auth-screen.hidden{display:none}
+.auth-card{width:100%;max-width:400px;background:#fff;border-radius:24px;padding:28px;box-shadow:0 15px 35px #0005}
+.logo{text-align:center;color:var(--primary);font-size:32px;font-weight:800;margin-bottom:22px}
+.logo i{font-size:46px;display:block;margin-bottom:10px}
+.auth-title{text-align:center;color:var(--text);font-size:22px;margin-bottom:18px}
+.input{width:100%;padding:14px 16px;border:1px solid var(--border);border-radius:12px;background:var(--bg);font-size:15px;margin-bottom:12px;outline:none}
+.input:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 4px #10b98122}
+.btn{width:100%;border:none;border-radius:12px;background:var(--primary);color:white;padding:14px;font-weight:800;font-size:16px;cursor:pointer}
+.switch{text-align:center;margin-top:15px;color:var(--muted);font-size:14px}.switch span{color:var(--primary);font-weight:800;cursor:pointer}
+.app{height:100vh;background:#fff;display:flex;flex-direction:column}
+.topbar{background:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px #0001;z-index:1000}
+.topbar h3{font-size:18px;color:var(--text)}
+.topbar button{border:none;border-radius:20px;background:#ecfdf5;color:#059669;padding:8px 12px;font-weight:800}
+#map{flex:1;width:100%;z-index:1}
+.panel{background:#fff;border-radius:22px 22px 0 0;padding:14px 16px;box-shadow:0 -4px 20px #0002;z-index:1000;max-height:360px;overflow:auto}
+.hint{text-align:center;color:var(--muted);font-size:13px;margin-bottom:10px}
+.row{display:flex;gap:8px;margin-bottom:10px;align-items:center}
+.wrap{flex:1;position:relative}
+.row input{width:100%;padding:13px;border:1px solid var(--border);border-radius:12px;background:var(--bg);font-size:14px;outline:none}
+.row button{width:90px;border:none;border-radius:12px;background:var(--primary);color:white;font-weight:800;padding:13px 8px}
+.suggest{position:absolute;left:0;right:0;bottom:48px;background:white;border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 20px #0002;z-index:3000;max-height:180px;overflow:auto;display:none}
+.item{padding:10px 12px;font-size:13px;color:var(--text);border-bottom:1px solid #f1f5f9;cursor:pointer;line-height:1.35}
+.item:hover{background:#ecfdf5}
+.order{margin-top:8px;width:100%;padding:15px;border:none;border-radius:14px;background:var(--primary);color:#fff;font-size:16px;font-weight:800}
+.info{background:#f1f5f9;border-radius:12px;padding:10px;font-size:13px;color:var(--muted);margin-top:8px;line-height:1.5}
+</style>
 </head>
 <body>
-  <div id="auth-screen">
-    <div class="brand-container"><div class="brand-title">LUNA RIDE</div><div class="car-track"><i class="fa-solid fa-car-side car-anim"></i></div></div>
-    <div class="auth-card">
-      <h2 class="auth-title" id="authTitle">Masuk Akun</h2>
-      <input type="text" id="nameInput" class="auth-input" placeholder="Nama lengkap" style="display:none;">
-      <input type="text" id="phoneInput" class="auth-input" placeholder="Nomor HP">
-      <input type="password" id="passwordInput" class="auth-input" placeholder="Password">
-      <button type="button" class="auth-btn" onclick="authAction()" id="authBtn">Masuk</button>
-      <div class="auth-switch"><span id="switchText">Belum punya akun?</span><span onclick="toggleAuth()" id="switchBtn"> Daftar</span></div>
-    </div>
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="logo"><i class="fa-solid fa-car-side"></i>LUNA RIDE</div>
+    <h2 class="auth-title" id="authTitle">Masuk Akun</h2>
+    <input id="nameInput" class="input" placeholder="Nama lengkap" style="display:none">
+    <input id="phoneInput" class="input" placeholder="Nomor HP">
+    <input id="passwordInput" type="password" class="input" placeholder="Password">
+    <button class="btn" id="authBtn" onclick="authAction()">Masuk</button>
+    <div class="switch"><span id="switchText">Belum punya akun?</span><span id="switchBtn" onclick="toggleAuth()"> Daftar</span></div>
   </div>
+</div>
 
-  <div class="app">
-    <div class="topbar"><h3><i class="fa-solid fa-location-dot" style="color:#10b981;"></i> Luna Ride</h3><button type="button" onclick="centerToAsal()"><i class="fa-solid fa-crosshairs"></i> Lokasi</button></div>
-    <div id="map"></div>
-    <div class="booking-panel">
-      <div class="hint" id="hintText">Klik tombol Asal/Tujuan, lalu klik titik di map.</div>
-      <div class="field-row"><input id="pickup" placeholder="Lokasi asal" readonly><button type="button" onclick="pilihAsal()">Asal</button></div>
-      <div class="field-row"><input id="destination" placeholder="Lokasi tujuan" readonly><button type="button" onclick="pilihTujuan()">Tujuan</button></div>
-      <button type="button" class="order-btn" onclick="pesanRide()"><i class="fa-solid fa-motorcycle"></i> Pesan Sekarang</button>
-      <div class="info-box" id="infoBox">Login dahulu, lalu pilih lokasi asal dan tujuan.</div>
-    </div>
+<div class="app">
+  <div class="topbar">
+    <h3><i class="fa-solid fa-location-dot" style="color:#10b981"></i> Luna Ride</h3>
+    <button onclick="centerToAsal()"><i class="fa-solid fa-crosshairs"></i> Lokasi</button>
   </div>
+  <div id="map"></div>
+  <div class="panel">
+    <div class="hint" id="hintText">Ketik alamat atau klik tombol Asal/Tujuan lalu klik map.</div>
+    <div class="row">
+      <div class="wrap"><input id="pickup" placeholder="Ketik alamat asal" autocomplete="off"><div class="suggest" id="pickupSuggestions"></div></div>
+      <button onclick="pilihAsal()">Asal</button>
+    </div>
+    <div class="row">
+      <div class="wrap"><input id="destination" placeholder="Ketik alamat tujuan" autocomplete="off"><div class="suggest" id="destinationSuggestions"></div></div>
+      <button onclick="pilihTujuan()">Tujuan</button>
+    </div>
+    <button class="order" onclick="pesanRide()"><i class="fa-solid fa-motorcycle"></i> Pesan Sekarang</button>
+    <div class="info" id="infoBox">Login dahulu, lalu pilih lokasi asal dan tujuan.</div>
+  </div>
+</div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    let isRegister=false,map,asalMarker,tujuanMarker,asalLatLng=null,tujuanLatLng=null,modePilih="asal",watchId=null,mapStarted=false,currentOrderId=null;
-    let userData={name:"",phone:""};
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+let isRegister=false,map,asalMarker,tujuanMarker,asalLatLng=null,tujuanLatLng=null,modePilih="asal",watchId=null,mapStarted=false;
+let alamatAsal="",alamatTujuan="",userData={name:"",phone:""},timerA=null,timerT=null;
 
-    function playSound(type){
-      try{
-        const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-        const osc=audioCtx.createOscillator();
-        const gain=audioCtx.createGain();
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.frequency.value=type==="success"?880:type==="alert"?660:520;
-        gain.gain.setValueAtTime(0.18,audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.35);
-        osc.start(); osc.stop(audioCtx.currentTime+0.35);
-      }catch(e){console.log(e)}
-    }
+function playSound(type){try{const c=new (window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=type==="success"?880:type==="alert"?660:520;g.gain.setValueAtTime(.18,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.35);o.start();o.stop(c.currentTime+.35)}catch(e){}}
+function cleanPhone(p){return p.replace(/\D/g,"")}
+function toggleAuth(){isRegister=!isRegister;authTitle.innerText=isRegister?"Daftar Akun":"Masuk Akun";authBtn.innerText=isRegister?"Daftar":"Masuk";nameInput.style.display=isRegister?"block":"none";switchText.innerText=isRegister?"Sudah punya akun?":"Belum punya akun?";switchBtn.innerText=isRegister?" Masuk":" Daftar"}
+function authAction(){
+  const phone=cleanPhone(phoneInput.value.trim()),pass=passwordInput.value.trim(),name=nameInput.value.trim();
+  if(!phone||!pass){alert("Nomor HP dan password wajib diisi");return}
+  if(typeof window.daftarRider!=="function"){alert("Firebase belum siap. Refresh halaman.");return}
+  if(isRegister){
+    if(!name){alert("Nama lengkap wajib diisi");return}
+    window.daftarRider(name,phone,pass).then(()=>{playSound("success");alert("Daftar berhasil. Silakan masuk.");toggleAuth()}).catch(e=>alert("Gagal daftar: "+e.message));return
+  }
+  window.loginRider(phone,pass).then(u=>{userData={name:u.name,phone:u.phone};auth-screen;document.getElementById("auth-screen").classList.add("hidden");setTimeout(()=>{if(!mapStarted){initMap();mapStarted=true}},300)}).catch(e=>alert("Gagal masuk: "+e.message))
+}
+function initMap(){
+  map=L.map("map").setView([-6.914744,107.609810],15);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(map);
+  map.on("click",e=>{if(modePilih==="asal")setLokasiAsal(e.latlng.lat,e.latlng.lng,true,true);else setLokasiTujuan(e.latlng.lat,e.latlng.lng,true,"")});
+  mulaiPantauLokasi();setupCariAlamat()
+}
+function mulaiPantauLokasi(){
+  if(!navigator.geolocation){infoBox.innerText="Browser tidak mendukung GPS.";return}
+  watchId=navigator.geolocation.watchPosition(pos=>{const lat=pos.coords.latitude,lng=pos.coords.longitude;if(!asalLatLng){setLokasiAsal(lat,lng,false,true);map.setView([lat,lng],17)}},err=>{infoBox.innerText="GPS gagal. Pastikan izin lokasi aktif."},{enableHighAccuracy:true,maximumAge:0,timeout:10000})
+}
+function icon(bg,ic){return L.divIcon({html:`<div style="width:38px;height:38px;background:${bg};color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid white;box-shadow:0 4px 12px #0005"><i class="fa-solid ${ic}"></i></div>`,className:"",iconSize:[38,38],iconAnchor:[19,19]})}
+async function reverseGeocode(lat,lng){try{const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&accept-language=id`),d=await r.json();return d.display_name||`${lat.toFixed(6)}, ${lng.toFixed(6)}`}catch(e){return `${lat.toFixed(6)}, ${lng.toFixed(6)}`}}
+async function cariAlamat(q){if(q.length<3)return[];const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(q)}&limit=5&countrycodes=id&accept-language=id`);return await r.json()}
+function setupCariAlamat(){
+  pickup.addEventListener("input",()=>{clearTimeout(timerA);timerA=setTimeout(()=>showSuggest("asal",pickup.value),650)});
+  destination.addEventListener("input",()=>{clearTimeout(timerT);timerT=setTimeout(()=>showSuggest("tujuan",destination.value),650)});
+  document.addEventListener("click",e=>{if(!e.target.closest(".wrap"))hideSuggest()})
+}
+async function showSuggest(type,q){
+  const box=document.getElementById(type==="asal"?"pickupSuggestions":"destinationSuggestions");box.innerHTML="";
+  if(q.trim().length<3){box.style.display="none";return}
+  try{const hasil=await cariAlamat(q);if(!hasil.length){box.style.display="none";return}
+    hasil.forEach(x=>{const div=document.createElement("div");div.className="item";div.textContent=x.display_name;div.onclick=()=>{const lat=parseFloat(x.lat),lng=parseFloat(x.lon);if(type==="asal")setLokasiAsal(lat,lng,true,false,x.display_name);else setLokasiTujuan(lat,lng,false,x.display_name);map.setView([lat,lng],17);hideSuggest()};box.appendChild(div)});
+    box.style.display="block"
+  }catch(e){box.style.display="none"}
+}
+function hideSuggest(){pickupSuggestions.style.display="none";destinationSuggestions.style.display="none"}
+async function setLokasiAsal(lat,lng,manual,getAddr=true,manualAddr=""){
+  asalLatLng=[lat,lng];if(asalMarker)asalMarker.setLatLng(asalLatLng);else asalMarker=L.marker(asalLatLng,{icon:icon("#10b981","fa-user")}).addTo(map);
+  asalMarker.bindPopup("Lokasi Asal").openPopup();alamatAsal=manualAddr||(getAddr?await reverseGeocode(lat,lng):`${lat.toFixed(6)}, ${lng.toFixed(6)}`);pickup.value=alamatAsal;infoBox.innerText=manual?"Lokasi asal berhasil dipilih.":"Lokasi asal otomatis dari GPS.";estimasi()
+}
+async function setLokasiTujuan(lat,lng,getAddr=true,manualAddr=""){
+  tujuanLatLng=[lat,lng];if(tujuanMarker)tujuanMarker.setLatLng(tujuanLatLng);else tujuanMarker=L.marker(tujuanLatLng,{icon:icon("#ef4444","fa-flag-checkered")}).addTo(map);
+  tujuanMarker.bindPopup("Lokasi Tujuan").openPopup();alamatTujuan=manualAddr||(getAddr?await reverseGeocode(lat,lng):`${lat.toFixed(6)}, ${lng.toFixed(6)}`);destination.value=alamatTujuan;infoBox.innerText="Lokasi tujuan berhasil dipilih.";estimasi()
+}
+function pilihAsal(){modePilih="asal";hintText.innerText="Mode pilih ASAL aktif. Klik titik asal di map."}
+function pilihTujuan(){modePilih="tujuan";hintText.innerText="Mode pilih TUJUAN aktif. Klik titik tujuan di map."}
+function centerToAsal(){if(!map||!asalLatLng){alert("Lokasi asal belum tersedia.");return}map.setView(asalLatLng,17);asalMarker.openPopup()}
+function jarakKm(a,b){const R=6371,dLat=(b[0]-a[0])*Math.PI/180,dLng=(b[1]-a[1])*Math.PI/180,la1=a[0]*Math.PI/180,la2=b[0]*Math.PI/180;const x=Math.sin(dLat/2)**2+Math.sin(dLng/2)**2*Math.cos(la1)*Math.cos(la2);return R*(2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x)))}
+function tarif(j){return Math.round(Math.max(5000+(j*2500),8000))}
+function rupiah(n){return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",minimumFractionDigits:0}).format(n)}
+function estimasi(){if(!asalLatLng||!tujuanLatLng)return;const j=jarakKm(asalLatLng,tujuanLatLng),t=tarif(j);infoBox.innerHTML=`Estimasi jarak: <b>${j.toFixed(2)} km</b><br>Estimasi tarif: <b>${rupiah(t)}</b>`}
+function pesanRide(){
+  if(!asalLatLng){alert("Lokasi asal belum dipilih.");return}if(!tujuanLatLng){alert("Lokasi tujuan belum dipilih.");return}
+  infoBox.innerHTML="Mengirim pesanan ke driver...";
+  window.kirimOrderKeFirebase(asalLatLng,tujuanLatLng,userData,alamatAsal,alamatTujuan).then(id=>{playSound("success");const j=jarakKm(asalLatLng,tujuanLatLng),t=tarif(j);infoBox.innerHTML=`<b>Pesanan berhasil dikirim!</b><br>Status: Menunggu driver.<br>Jarak: ${j.toFixed(2)} km<br>Tarif: ${rupiah(t)}`;window.pantauStatusOrder(id)}).catch(e=>{alert("Gagal kirim order: "+e.message);infoBox.innerText="Pesanan gagal dikirim."})
+}
+window.addEventListener("beforeunload",()=>{if(watchId!==null)navigator.geolocation.clearWatch(watchId)})
+</script>
 
-    function bersihkanNomorHP(phone){return phone.replace(/\D/g,"")}
-    function toggleAuth(){isRegister=!isRegister;document.getElementById("authTitle").innerText=isRegister?"Daftar Akun":"Masuk Akun";document.getElementById("authBtn").innerText=isRegister?"Daftar":"Masuk";document.getElementById("nameInput").style.display=isRegister?"block":"none";document.getElementById("switchText").innerText=isRegister?"Sudah punya akun?":"Belum punya akun?";document.getElementById("switchBtn").innerText=isRegister?" Masuk":" Daftar"}
-
-    function authAction(){
-      const phone=bersihkanNomorHP(document.getElementById("phoneInput").value.trim());
-      const password=document.getElementById("passwordInput").value.trim();
-      const name=document.getElementById("nameInput").value.trim();
-      if(phone===""||password===""){alert("Nomor HP dan password wajib diisi");return}
-      if(typeof window.daftarRider!=="function"||typeof window.loginRider!=="function"){alert("Firebase belum siap. Refresh halaman.");return}
-
-      if(isRegister){
-        if(name===""){alert("Nama lengkap wajib diisi");return}
-        window.daftarRider(name,phone,password).then(()=>{playSound("success");alert("Daftar berhasil. Silakan masuk.");toggleAuth()}).catch(error=>alert("Gagal daftar: "+error.message));
-        return;
-      }
-
-      window.loginRider(phone,password).then(user=>{
-        userData.name=user.name; userData.phone=user.phone;
-        document.getElementById("auth-screen").classList.add("hidden");
-        setTimeout(()=>{if(!mapStarted){initMap();mapStarted=true}},300);
-      }).catch(error=>alert("Gagal masuk: "+error.message));
-    }
-
-    function initMap(){map=L.map("map").setView([-6.914744,107.609810],15);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(map);map.on("click",e=>{if(modePilih==="asal")setLokasiAsal(e.latlng.lat,e.latlng.lng,true);else setLokasiTujuan(e.latlng.lat,e.latlng.lng)});mulaiPantauLokasi()}
-    function mulaiPantauLokasi(){if(!navigator.geolocation){document.getElementById("infoBox").innerText="Browser tidak mendukung GPS.";return}watchId=navigator.geolocation.watchPosition(pos=>{const lat=pos.coords.latitude,lng=pos.coords.longitude;if(!asalLatLng){setLokasiAsal(lat,lng,false);map.setView([lat,lng],17)}},error=>{let pesan="Gagal mengambil lokasi.";if(error.code===1)pesan="Izin lokasi ditolak. Aktifkan izin lokasi browser.";if(error.code===2)pesan="GPS/lokasi tidak tersedia.";if(error.code===3)pesan="Pengambilan lokasi terlalu lama.";document.getElementById("infoBox").innerText=pesan},{enableHighAccuracy:true,maximumAge:0,timeout:10000})}
-    function makeIcon(bg,icon){return L.divIcon({html:`<div style="width:38px;height:38px;background:${bg};color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid white;box-shadow:0 4px 12px rgba(0,0,0,.3);"><i class="fa-solid ${icon}"></i></div>`,className:"",iconSize:[38,38],iconAnchor:[19,19]})}
-    function setLokasiAsal(lat,lng,manual){asalLatLng=[lat,lng];if(asalMarker)asalMarker.setLatLng(asalLatLng);else asalMarker=L.marker(asalLatLng,{icon:makeIcon("#10b981","fa-user")}).addTo(map);asalMarker.bindPopup("Lokasi Asal").openPopup();document.getElementById("pickup").value=lat.toFixed(6)+", "+lng.toFixed(6);document.getElementById("infoBox").innerText=manual?"Lokasi asal berhasil diubah.":"Lokasi asal otomatis dari GPS aktif.";tampilkanEstimasi()}
-    function setLokasiTujuan(lat,lng){tujuanLatLng=[lat,lng];if(tujuanMarker)tujuanMarker.setLatLng(tujuanLatLng);else tujuanMarker=L.marker(tujuanLatLng,{icon:makeIcon("#ef4444","fa-flag-checkered")}).addTo(map);tujuanMarker.bindPopup("Lokasi Tujuan").openPopup();document.getElementById("destination").value=lat.toFixed(6)+", "+lng.toFixed(6);document.getElementById("infoBox").innerText="Lokasi tujuan berhasil dipilih.";tampilkanEstimasi()}
-    function pilihAsal(){modePilih="asal";document.getElementById("hintText").innerText="Mode pilih ASAL aktif. Klik titik asal di map.";document.getElementById("infoBox").innerText="Silakan klik lokasi asal pada map."}
-    function pilihTujuan(){modePilih="tujuan";document.getElementById("hintText").innerText="Mode pilih TUJUAN aktif. Klik titik tujuan di map.";document.getElementById("infoBox").innerText="Silakan klik lokasi tujuan pada map."}
-    function centerToAsal(){if(!map||!asalLatLng){alert("Lokasi asal belum tersedia.");return}map.setView(asalLatLng,17);asalMarker.openPopup()}
-    function hitungJarakKm(asal,tujuan){const R=6371,dLat=(tujuan[0]-asal[0])*Math.PI/180,dLng=(tujuan[1]-asal[1])*Math.PI/180,lat1=asal[0]*Math.PI/180,lat2=tujuan[0]*Math.PI/180;const a=Math.sin(dLat/2)**2+Math.sin(dLng/2)**2*Math.cos(lat1)*Math.cos(lat2);return R*(2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)))}
-    function hitungTarif(jarakKm){return Math.round(Math.max(5000+(jarakKm*2500),8000))}
-    function formatRupiah(angka){return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",minimumFractionDigits:0}).format(angka)}
-    function tampilkanEstimasi(){if(!asalLatLng||!tujuanLatLng)return;const jarak=hitungJarakKm(asalLatLng,tujuanLatLng),tarif=hitungTarif(jarak);document.getElementById("infoBox").innerHTML=`Estimasi jarak: <b>${jarak.toFixed(2)} km</b><br>Estimasi tarif: <b>${formatRupiah(tarif)}</b>`}
-    function pesanRide(){if(!asalLatLng){alert("Lokasi asal belum dipilih.");return}if(!tujuanLatLng){alert("Lokasi tujuan belum dipilih.");return}if(typeof window.kirimOrderKeFirebase!=="function"){alert("Firebase belum siap. Refresh halaman.");return}document.getElementById("infoBox").innerHTML="Mengirim pesanan ke driver...";window.kirimOrderKeFirebase(asalLatLng,tujuanLatLng,userData).then(orderId=>{currentOrderId=orderId;playSound("success");const jarak=hitungJarakKm(asalLatLng,tujuanLatLng),tarif=hitungTarif(jarak);document.getElementById("infoBox").innerHTML=`<b>Pesanan berhasil dikirim!</b><br>Status: Menunggu driver.<br>Jarak: ${jarak.toFixed(2)} km<br>Tarif: ${formatRupiah(tarif)}`;if(typeof window.pantauStatusOrder==="function")window.pantauStatusOrder(orderId)}).catch(error=>{alert("Gagal kirim order: "+error.message);document.getElementById("infoBox").innerText="Pesanan gagal dikirim."})}
-    window.addEventListener("beforeunload",()=>{if(watchId!==null)navigator.geolocation.clearWatch(watchId)})
-  </script>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, push, set, onValue, get, child } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-    
-const firebaseConfig = {
-  apiKey: "AIzaSyAPmHTjD7HvqQALbegPVBDEE8utz6wqb7o",
-  authDomain: "luna-ride-projek.firebaseapp.com",
-  databaseURL: "https://luna-ride-projek-default-rtdb.asia-southeast1.firebasedatabase.app/",
-  projectId: "luna-ride-projek",
-  storageBucket: "luna-ride-projek.firebasestorage.app",
-  messagingSenderId: "350029772655",
-  appId: "1:350029772655:web:5da8abdc58810dac3f5a9a"
-};
-
-    const app=initializeApp(firebaseConfig);const db=getDatabase(app);
-
-    window.daftarRider=function(name,phone,password){
-      return get(child(ref(db),"users/riders/"+phone)).then(snapshot=>{
-        if(snapshot.exists())throw new Error("Nomor HP sudah terdaftar.");
-        return set(ref(db,"users/riders/"+phone),{name,phone,password,role:"rider",createdAt:Date.now()});
-      });
-    };
-    window.loginRider=function(phone,password){
-      return get(child(ref(db),"users/riders/"+phone)).then(snapshot=>{
-        if(!snapshot.exists())throw new Error("Akun belum terdaftar.");
-        const user=snapshot.val();
-        if(user.password!==password)throw new Error("Password salah.");
-        return user;
-      });
-    };
-    window.kirimOrderKeFirebase=function(asalLatLng,tujuanLatLng,userData){
-      const orderRef=push(ref(db,"orders"));
-      const jarak=hitungJarakKm(asalLatLng,tujuanLatLng);
-      const tarif=hitungTarif(jarak);
-      const dataOrder={customerName:userData.name||"Penumpang Luna",customerPhone:userData.phone||"-",asal:{lat:asalLatLng[0],lng:asalLatLng[1]},tujuan:{lat:tujuanLatLng[0],lng:tujuanLatLng[1]},jarakKm:jarak.toFixed(2),tarif,tarifText:formatRupiah(tarif),status:"menunggu_driver",driverId:"",createdAt:Date.now(),waktu:new Date().toLocaleString("id-ID")};
-      return set(orderRef,dataOrder).then(()=>orderRef.key);
-    };
-    window.pantauStatusOrder=function(orderId){
-      onValue(ref(db,"orders/"+orderId),snapshot=>{
-        const order=snapshot.val(); if(!order)return;
-        if(order.status==="menunggu_driver"){document.getElementById("infoBox").innerHTML=`<b>Pesanan berhasil dikirim!</b><br>Status: Menunggu driver.<br>Jarak: ${order.jarakKm||"-"} km<br>Tarif: ${order.tarifText||"-"}`;}
-        if(order.status==="driver_menuju_penumpang"){playSound("alert");document.getElementById("infoBox").innerHTML=`<b>Driver menerima pesanan!</b><br>Driver: ${order.driverName||"-"}<br>Kendaraan: ${order.driverVehicle||"-"} • ${order.driverPlate||"-"}<br>Driver sedang menuju lokasi penjemputan.<br>Tarif: ${order.tarifText||"-"}`;}
-      });
-    };
-  </script>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getDatabase,ref,push,set,onValue,get,child}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+const firebaseConfig={apiKey:"AIzaSyAPmHTjD7HvqQALbegPVBDEE8utz6wqb7o",authDomain:"luna-ride-projek.firebaseapp.com",databaseURL:"https://luna-ride-projek-default-rtdb.asia-southeast1.firebasedatabase.app/",projectId:"luna-ride-projek",storageBucket:"luna-ride-projek.firebasestorage.app",messagingSenderId:"350029772655",appId:"1:350029772655:web:5da8abdc58810dac3f5a9a"};
+const app=initializeApp(firebaseConfig),db=getDatabase(app);
+window.daftarRider=(name,phone,password)=>get(child(ref(db),"users/riders/"+phone)).then(s=>{if(s.exists())throw new Error("Nomor HP sudah terdaftar.");return set(ref(db,"users/riders/"+phone),{name,phone,password,role:"rider",createdAt:Date.now()})});
+window.loginRider=(phone,password)=>get(child(ref(db),"users/riders/"+phone)).then(s=>{if(!s.exists())throw new Error("Akun belum terdaftar.");const u=s.val();if(u.password!==password)throw new Error("Password salah.");return u});
+window.kirimOrderKeFirebase=(asal,tujuan,user,alamatAsal,alamatTujuan)=>{const o=push(ref(db,"orders")),j=jarakKm(asal,tujuan),t=tarif(j);return set(o,{customerName:user.name||"Penumpang Luna",customerPhone:user.phone||"-",asal:{lat:asal[0],lng:asal[1],alamat:alamatAsal||"-"},tujuan:{lat:tujuan[0],lng:tujuan[1],alamat:alamatTujuan||"-"},alamatAsal:alamatAsal||"-",alamatTujuan:alamatTujuan||"-",jarakKm:j.toFixed(2),tarif:t,tarifText:rupiah(t),status:"menunggu_driver",driverId:"",createdAt:Date.now(),waktu:new Date().toLocaleString("id-ID")}).then(()=>o.key)};
+window.pantauStatusOrder=id=>onValue(ref(db,"orders/"+id),s=>{const o=s.val();if(!o)return;if(o.status==="driver_menuju_penumpang"){playSound("alert");infoBox.innerHTML=`<b>Driver menerima pesanan!</b><br>Driver: ${o.driverName||"-"}<br>Kendaraan: ${o.driverVehicle||"-"} • ${o.driverPlate||"-"}<br>Driver sedang menuju lokasi penjemputan.<br>Tarif: ${o.tarifText||"-"}`}});
+</script>
 </body>
 </html>
