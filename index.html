@@ -89,7 +89,7 @@ function authAction(){
     if(!name){alert("Nama lengkap wajib diisi");return}
     window.daftarRider(name,phone,pass).then(()=>{playSound("success");alert("Daftar berhasil. Silakan masuk.");toggleAuth()}).catch(e=>alert("Gagal daftar: "+e.message));return
   }
-  window.loginRider(phone,pass).then(u=>{userData={name:u.name,phone:u.phone};auth-screen;document.getElementById("auth-screen").classList.add("hidden");setTimeout(()=>{if(!mapStarted){initMap();mapStarted=true}},300)}).catch(e=>alert("Gagal masuk: "+e.message))
+  window.loginRider(phone,pass).then(u=>{userData={name:u.name,phone:u.phone};document.getElementById("auth-screen").classList.add("hidden");setTimeout(()=>{if(!mapStarted){initMap();mapStarted=true}},300)}).catch(e=>alert("Gagal masuk: "+e.message))
 }
 function initMap(){
   map=L.map("map").setView([-6.914744,107.609810],15);
